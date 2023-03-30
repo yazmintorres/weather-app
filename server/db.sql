@@ -97,13 +97,18 @@ ALTER TABLE ONLY public.students
 --
 
 
--- CREATE STUDENTS TABLE 
+-- CREATE users TABLE 
 
-CREATE TABLE public.contacts (
-	contact_id serial PRIMARY KEY,
-	firstname VARCHAR(255) NOT NULL,
-    lastname VARCHAR (255) NOT NULL,
-	phone VARCHAR(25) NOT NULL,
-	email VARCHAR(255) NOT NULL,
-    notes TEXT
+CREATE TYPE public.statecode AS ENUM('AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY');
+
+CREATE TABLE public.users (
+    user_id serial PRIMARY KEY, 
+    username VARCHAR(255) NOT NULL, 
+    fav_city VARCHAR(255) NOT NULL,
+    state_code PUBLIC.STATECODE NOT NULL,
+    country_code VARCHAR(2) DEFAULT 'US'
+	
 );
+
+
+
