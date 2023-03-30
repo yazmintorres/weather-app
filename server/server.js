@@ -11,6 +11,7 @@ app.use(express.json());
 
 // creates an endpoint for the route "/""
 app.get("/", (req, res) => {
+  console.log(process.env);
   res.json({ message: "Hola, from My template ExpressJS with React-Vite" });
 });
 
