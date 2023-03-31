@@ -4,6 +4,7 @@ import WeatherCard from "./WeatherCard";
 
 const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   const [weatherData, setWeatherData] = useState(false);
+  console.log("editing city", editingCity);
 
   // create initial state for contacts list
   const [city, setCity] = useState(
