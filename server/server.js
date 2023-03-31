@@ -28,10 +28,10 @@ app.get("/api/cities", async (req, res) => {
 // get the weather for any city
 app.get("/api/weather", async (req, res) => {
   try {
-    const { username, fav_city, state_code } = req.body;
+    console.log(req.query);
+    const { username, fav_city, state_code } = req.query;
     const apiKey = process.env.API_KEY;
     const q = `${fav_city},${state_code},US`;
-    console.log(q);
     const params = new URLSearchParams({
       q,
       appid: apiKey,
