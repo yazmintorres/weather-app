@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const path = require("path");
 const db = require("./db/db-connection.js");
+const { stat } = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -11,42 +12,50 @@ app.use(express.json());
 
 // creates an endpoint for the route "/""
 app.get("/", (req, res) => {
-  console.log(process.env);
   res.json({ message: "Hola, from My template ExpressJS with React-Vite" });
 });
 
-// create the get request for students in the endpoint '/api/students'
-app.get("/api/contacts", async (req, res) => {
+// get all the favorite cities that are saved for a user
+app.get("/api/users", async (req, res) => {
   try {
-    const { rows: contacts } = await db.query("SELECT * FROM contacts");
-    res.send(contacts);
+    const { rows: users } = await db.query("SELECT * FROM users");
+    res.json(users);
   } catch (e) {
     return res.status(400).json({ e });
   }
 });
 
-// create the POST request
-app.post("/api/contact", async (req, res) => {
+// get the weather for any city
+app.get("/api/weather", async (req, res) => {
   try {
-    const newContact = {
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      phone: req.body.phone,
-      email: req.body.email,
-      notes: req.body.notes,
-    };
-    console.log(req.body);
+    const { username, fav_city, state_code } = req.body;
+    const apiKey = process.env.API_KEY;
+    const q = `${fav_city},${state_code},US`;
+    console.log(q);
+    const params = new URLSearchParams({
+      q,
+      appid: apiKey,
+      units: "imperial",
+    });
+    const url = `https://api.openweathermap.org/data/2.5/weather?${params}`;
+    console.log(url);
+    const response = await fetch(url);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// create the POST request if user says the city is a favorite
+app.post("/api/user/fav", async (req, res) => {
+  try {
+    const { username, fav_city, state_code } = req.body;
     const result = await db.query(
-      "INSERT INTO contacts (firstname, lastname, phone, email, notes) VALUES($1, $2, $3, $4, $5) RETURNING *",
-      [
-        newContact.firstname,
-        newContact.lastname,
-        newContact.phone,
-        newContact.email,
-        newContact.notes,
-      ]
+      "INSERT INTO users (username, fav_city, state_code) VALUES($1, $2, $3) RETURNING *",
+      [username, fav_city, state_code]
     );
-    console.log(result.rows[0]);
+
     res.json(result.rows[0]);
   } catch (e) {
     console.log(e);
@@ -54,13 +63,13 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-// delete request for contacts
-app.delete("/api/contact/:contactId", async (req, res) => {
+// delete request for users
+app.delete("/api/user/:userId", async (req, res) => {
   try {
     console.log(req.params);
-    const contactId = req.params.contactId;
-    await db.query("DELETE FROM contacts WHERE contact_id=$1", [contactId]);
-    console.log("From the delete request-url", contactId);
+    const userId = req.params.userId;
+    await db.query("DELETE FROM users WHERE user_id=$1", [userId]);
+    console.log("From the delete request-url", userId);
     res.status(200).end();
   } catch (e) {
     console.log(e);
