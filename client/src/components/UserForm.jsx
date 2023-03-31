@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form } from "react-bootstrap";
+import WeatherCard from "./WeatherCard";
 
 const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
-  const [isFav, setIsFav] = useState(false);
-
-  useEffect(() => {
-    console.log(isFav);
-  }, [isFav]);
+  const [weatherData, setWeatherData] = useState(false);
 
   // create initial state for contacts list
   const [city, setCity] = useState(
@@ -14,22 +11,29 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
       username: "",
       fav_city: "",
       state_code: "",
+      isFav: false,
     }
   );
 
+  useEffect(() => {
+    console.log(city);
+  }, [city]);
   //create functions that handle the event of the user typing into the form
   const handleChange = (property) => {
     return (e) => {
-      console.log(e.target.value);
-      setCity({ ...city, [property]: e.target.value });
+      const { value, type, checked } = e.target;
+      console.log(value, type, checked);
+      setCity({ ...city, [property]: type === "checkbox" ? checked : value });
     };
   };
 
   const clearForm = () => {
+    console.log("test");
     setCity({
       username: "",
       fav_city: "",
       state_code: "",
+      isFav: false,
     });
     // also want to reset state of editing city to null bc we are no longer editing a city after we submit and clear the form
     onEdit(null);
@@ -71,10 +75,17 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   };
 
   //A function to handle the submit in both cases - Post and Put request!
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // when handle submit need to make a request to the weather api to render the weather infomration
-    // if isFav is true then we need to add to database
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/weather?username=${city.username}&fav_city=${city.fav_city}&state_code=${city.state_code}`
+      );
+      const data = await response.json();
+      setWeatherData(data);
+    } catch (error) {
+      console.error(error.message);
+    }
     if (isFav) {
       if (city.user_id) {
         putCity(city);
@@ -87,62 +98,67 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   // handle
 
   return (
-    <Form className="form-students" onSubmit={handleSubmit}>
-      <Form.Group>
-        <Form.Label htmlFor="add-user-name">Username</Form.Label>
-        <input
-          type="text"
-          id="add-user-name"
-          placeholder="Username"
-          required
-          value={city.username}
-          onChange={handleChange("username")}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label htmlFor="add-city">City:</Form.Label>
-        <input
-          type="text"
-          id="add-city"
-          placeholder="City"
-          required
-          value={city.fav_city}
-          onChange={handleChange("fav_city")}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label htmlFor="add-state">State</Form.Label>
-        <input
-          type="text"
-          id="add-state"
-          placeholder="State"
-          required
-          value={city.state_code}
-          onChange={handleChange("state_code")}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Check
-          type={"checkbox"}
-          id={`isFav-checkbox`}
-          label={`Check if you want to add to favorites`}
-          value={isFav}
-          onClick={() => {
-            setIsFav(!isFav);
-          }}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Button type="submit" variant="outline-success">
-          {city.user_id ? "Edit Contact" : "Add Contact"}
-        </Button>
-        {city.user_id ? (
-          <Button type="button" variant="outline-warning" onClick={clearForm}>
-            Cancel
+    <div className="form-students">
+      <Form className="form-students" onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label htmlFor="add-user-name">Username</Form.Label>
+          <input
+            type="text"
+            id="add-user-name"
+            placeholder="Username"
+            required
+            value={city.username}
+            onChange={handleChange("username")}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label htmlFor="add-city">City:</Form.Label>
+          <input
+            type="text"
+            id="add-city"
+            placeholder="City"
+            required
+            value={city.fav_city}
+            onChange={handleChange("fav_city")}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label htmlFor="add-state">State</Form.Label>
+          <input
+            type="text"
+            id="add-state"
+            placeholder="State"
+            required
+            value={city.state_code}
+            onChange={handleChange("state_code")}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check
+            type={"checkbox"}
+            id={`isFav-checkbox`}
+            label={`Check if you want to add to favorites`}
+            value={city.isFav}
+            onChange={handleChange("isFav")}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Button type="submit" variant="outline-success">
+            {city.user_id ? "Edit" : "Get Weather"}
           </Button>
-        ) : null}
-      </Form.Group>
-    </Form>
+          {city.user_id ? (
+            <Button type="button" variant="outline-warning" onClick={clearForm}>
+              Cancel
+            </Button>
+          ) : null}
+        </Form.Group>
+      </Form>
+      {weatherData ? (
+        <WeatherCard weatherData={weatherData} />
+      ) : (
+        <span>Please add information</span>
+      )}
+    </div>
   );
 };
 

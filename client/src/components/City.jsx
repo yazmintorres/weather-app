@@ -18,8 +18,8 @@ const City = ({ city, onEdit, onDelete }) => {
         <Card.Title style={{ marginBottom: "15px" }}>
           {city.username}
         </Card.Title>
-        <Card.Text>{city.fav_city}</Card.Text>
-        <Card.Text>Email: {city.state_code}</Card.Text>
+        <Card.Text>City: {city.fav_city}</Card.Text>
+        <Card.Text>State: {city.state_code}</Card.Text>
         <Button
           variant="outline-danger"
           onClick={() => {
