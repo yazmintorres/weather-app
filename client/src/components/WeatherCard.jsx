@@ -1,11 +1,11 @@
-const WeatherCard = ({ weatherData }) => {
+const WeatherCard = ({ weatherData, state_code }) => {
   return (
     <div className="weather-card">
       <div className="result">
         <p>
           City:{" "}
           <span className="data">
-            {weatherData.name}, {weatherData.sys.country}
+            {weatherData.name}, {state_code}
           </span>
         </p>
         <p>

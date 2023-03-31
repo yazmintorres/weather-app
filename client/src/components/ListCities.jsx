@@ -53,7 +53,7 @@ const ListCities = () => {
   return (
     <div className="mybody">
       <div className="list-students">
-        <h2>My Favorite Cities</h2>
+        <h2>Favorite Cities</h2>
         <ul>
           {cities.map((city) => {
             return (

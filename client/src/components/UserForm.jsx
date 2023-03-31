@@ -23,7 +23,10 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
     return (e) => {
       const { value, type, checked } = e.target;
       console.log(value, type, checked);
-      setCity({ ...city, [property]: type === "checkbox" ? checked : value });
+      setCity({
+        ...city,
+        [property]: type === "checkbox" ? checked : value,
+      });
     };
   };
 
@@ -70,27 +73,30 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
       .then((data) => {
         afterCityUpdate();
         //this line just for cleaning the form
-        clearForm();
+        // clearForm();
       });
   };
 
   //A function to handle the submit in both cases - Post and Put request!
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const temp = { ...city };
+    temp.fav_city = city.fav_city.trim();
+    temp.state_code = city.state_code.toUpperCase();
     try {
       const response = await fetch(
-        `http://localhost:8080/api/weather?username=${city.username}&fav_city=${city.fav_city}&state_code=${city.state_code}`
+        `http://localhost:8080/api/weather?username=${temp.username}&fav_city=${temp.fav_city}&state_code=${temp.state_code}`
       );
       const data = await response.json();
       setWeatherData(data);
     } catch (error) {
       console.error(error.message);
     }
-    if (isFav) {
-      if (city.user_id) {
-        putCity(city);
+    if (temp.isFav) {
+      if (temp.user_id) {
+        putCity(temp);
       } else {
-        postCity(city);
+        postCity(temp);
       }
     }
   };
@@ -144,8 +150,13 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
         </Form.Group>
         <Form.Group>
           <Button type="submit" variant="outline-success">
-            {city.user_id ? "Edit" : "Get Weather"}
+            Get Weather
           </Button>
+          {city.user_id ? (
+            <Button type="submit" variant="outline-success">
+              Edit
+            </Button>
+          ) : null}
           {city.user_id ? (
             <Button type="button" variant="outline-warning" onClick={clearForm}>
               Cancel
@@ -154,7 +165,7 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
         </Form.Group>
       </Form>
       {weatherData ? (
-        <WeatherCard weatherData={weatherData} />
+        <WeatherCard weatherData={weatherData} state_code={city.state_code} />
       ) : (
         <span>Please add information</span>
       )}

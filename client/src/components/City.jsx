@@ -15,9 +15,7 @@ const City = ({ city, onEdit, onDelete }) => {
   return (
     <Card>
       <Card.Body>
-        <Card.Title style={{ marginBottom: "15px" }}>
-          {city.username}
-        </Card.Title>
+        <Card.Text>Name: {city.username}</Card.Text>
         <Card.Text>City: {city.fav_city}</Card.Text>
         <Card.Text>State: {city.state_code}</Card.Text>
         <Button
