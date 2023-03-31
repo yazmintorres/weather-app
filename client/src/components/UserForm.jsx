@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Button, Form } from "react-bootstrap";
 
 const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
-  // create initial state for contacts list
+  const [isFav, setIsFav] = useState(false);
 
+  useEffect(() => {
+    console.log(isFav);
+  }, [isFav]);
+
+  // create initial state for contacts list
   const [city, setCity] = useState(
     editingCity || {
       username: "",
@@ -15,6 +20,7 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   //create functions that handle the event of the user typing into the form
   const handleChange = (property) => {
     return (e) => {
+      console.log(e.target.value);
       setCity({ ...city, [property]: e.target.value });
     };
   };
@@ -67,12 +73,18 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   //A function to handle the submit in both cases - Post and Put request!
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (city.user_id) {
-      putCity(city);
-    } else {
-      postCity(city);
+    // when handle submit need to make a request to the weather api to render the weather infomration
+    // if isFav is true then we need to add to database
+    if (isFav) {
+      if (city.user_id) {
+        putCity(city);
+      } else {
+        postCity(city);
+      }
     }
   };
+
+  // handle
 
   return (
     <Form className="form-students" onSubmit={handleSubmit}>
@@ -110,6 +122,17 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
         />
       </Form.Group>
       <Form.Group>
+        <Form.Check
+          type={"checkbox"}
+          id={`isFav-checkbox`}
+          label={`Check if you want to add to favorites`}
+          value={isFav}
+          onClick={() => {
+            setIsFav(!isFav);
+          }}
+        />
+      </Form.Group>
+      <Form.Group>
         <Button type="submit" variant="outline-success">
           {city.user_id ? "Edit Contact" : "Add Contact"}
         </Button>
@@ -124,3 +147,15 @@ const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
 };
 
 export default UserForm;
+
+{
+  /* <Button
+// onClick={onHeartClick}
+style={favHeart ? { color: "palevioletred" } : null}
+type="button"
+variant="heart"
+className="heart"
+>
+<span>&#10084;</span>
+</Button> */
+}

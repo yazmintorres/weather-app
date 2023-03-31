@@ -71,3 +71,23 @@ button.btn.btn-primary {
   margin-left: 2em;
   margin-right: 2em;
 }
+
+/* HEART STYLING */
+
+.heart {
+  color: white;
+  font-size: 2.5rem;
+  background: none;
+  border: none;
+}
+
+.heart span {
+  text-shadow: -2px 0 palevioletred, 0 2px palevioletred, 2px 0 palevioletred,
+    0 -2px palevioletred;
+}
+
+/* button  */
+
+.btn {
+  margin: 10px 10px 10px 0px;
+}
