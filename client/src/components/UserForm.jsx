@@ -1,73 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form } from "react-bootstrap";
 
-const UserForm = ({ onSaveContact, onUpdateContact, editingContact }) => {
+const UserForm = ({ addCity, editingCity, afterCityUpdate, onEdit }) => {
   // create initial state for contacts list
 
-  const [contact, setContact] = useState(
-    editingContact || {
-      firstname: "",
-      lastname: "",
-      phone: "",
-      email: "",
-      notes: "",
+  const [city, setCity] = useState(
+    editingCity || {
+      username: "",
+      fav_city: "",
+      state_code: "",
     }
   );
 
   //create functions that handle the event of the user typing into the form
   const handleChange = (property) => {
     return (e) => {
-      setContact({ ...contact, [property]: e.target.value });
-      // console.log(contact);
+      setCity({ ...city, [property]: e.target.value });
     };
   };
 
   const clearForm = () => {
-    setContact({
-      firstname: "",
-      lastname: "",
-      phone: "",
-      email: "",
-      notes: "",
+    setCity({
+      username: "",
+      fav_city: "",
+      state_code: "",
     });
-    window.location = "/";
+    // also want to reset state of editing city to null bc we are no longer editing a city after we submit and clear the form
+    onEdit(null);
   };
 
   //A function to handle the post request
-  const postContact = (contact) => {
-    return fetch("http://localhost:8080/api/contact", {
+  const postCity = (city) => {
+    return fetch("http://localhost:8080/api/user/fav", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(contact),
+      body: JSON.stringify(city),
     })
       .then((response) => {
         return response.json();
       })
-      .then((data) => {
-        //console.log("From the post ", data);
-        //I'm sending data to the List of Students (the parent) for updating the list
-        onSaveContact(data);
+      .then((newCity) => {
+        addCity(newCity);
         //this line just for cleaning the form
         clearForm();
       });
   };
 
-  //A function to handle the post request
-  const putContact = (toEditContact) => {
+  //A function to handle the put (update) request
+  const putCity = (cityToEdit) => {
     console.log("test");
-    return fetch(
-      `http://localhost:8080/api/contact/${toEditContact.contact_id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(toEditContact),
-      }
-    )
+    return fetch(`http://localhost:8080/api/user/${cityToEdit.user_id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cityToEdit),
+    })
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        onUpdateContact(data);
+        afterCityUpdate();
         //this line just for cleaning the form
         clearForm();
       });
@@ -76,81 +67,53 @@ const UserForm = ({ onSaveContact, onUpdateContact, editingContact }) => {
   //A function to handle the submit in both cases - Post and Put request!
   const handleSubmit = (e) => {
     e.preventDefault();
-    const temp = { ...contact };
-    for (let property in temp) {
-      if (!temp[property]) {
-        temp[property] = null;
-      }
-    }
-    console.log("Actual contact variable in this moment", contact);
-    console.log("Temp variable with null replacing", temp);
-    if (temp.contact_id) {
-      putContact(temp);
+    if (city.user_id) {
+      putCity(city);
     } else {
-      postContact(temp);
+      postCity(city);
     }
   };
 
   return (
     <Form className="form-students" onSubmit={handleSubmit}>
       <Form.Group>
-        <Form.Label htmlFor="add-user-name">First Name</Form.Label>
+        <Form.Label htmlFor="add-user-name">Username</Form.Label>
         <input
           type="text"
           id="add-user-name"
-          placeholder="First Name"
+          placeholder="Username"
           required
-          value={contact.firstname}
-          onChange={handleChange("firstname")}
+          value={city.username}
+          onChange={handleChange("username")}
         />
       </Form.Group>
       <Form.Group>
-        <Form.Label htmlFor="add-user-lastname">Last Name</Form.Label>
+        <Form.Label htmlFor="add-city">City:</Form.Label>
         <input
           type="text"
-          id="add-user-lastname"
-          placeholder="Last Name"
+          id="add-city"
+          placeholder="City"
           required
-          value={contact.lastname}
-          onChange={handleChange("lastname")}
+          value={city.fav_city}
+          onChange={handleChange("fav_city")}
         />
       </Form.Group>
       <Form.Group>
-        <Form.Label htmlFor="add-user-phone">Phone Number</Form.Label>
+        <Form.Label htmlFor="add-state">State</Form.Label>
         <input
           type="text"
-          id="add-user-phone"
-          placeholder="Phone Number"
+          id="add-state"
+          placeholder="State"
           required
-          value={contact.phone}
-          onChange={handleChange("phone")}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label htmlFor="add-user-email">Email</Form.Label>
-        <input
-          type="text"
-          id="add-user-email"
-          placeholder="Email"
-          required
-          value={contact.email}
-          onChange={handleChange("email")}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label htmlFor="add-user-notes">Notes</Form.Label>
-        <textarea
-          id="add-user-notes"
-          placeholder="Notes"
-          value={!contact.notes ? "" : contact.notes}
-          onChange={handleChange("notes")}
+          value={city.state_code}
+          onChange={handleChange("state_code")}
         />
       </Form.Group>
       <Form.Group>
         <Button type="submit" variant="outline-success">
-          {contact.contact_id ? "Edit Contact" : "Add Contact"}
+          {city.user_id ? "Edit Contact" : "Add Contact"}
         </Button>
-        {contact.contact_id ? (
+        {city.user_id ? (
           <Button type="button" variant="outline-warning" onClick={clearForm}>
             Cancel
           </Button>

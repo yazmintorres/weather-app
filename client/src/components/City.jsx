@@ -3,29 +3,27 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import * as ioicons from "react-icons/io5";
 
-const Contact = ({ contact, toUpdate, toDelete }) => {
-  const onUpdate = (toUpdateContact) => {
-    // console.log(toUpdateContact);
-    toUpdate(toUpdateContact);
+const City = ({ city, onEdit, onDelete }) => {
+  const handleEditClick = (city) => {
+    onEdit(city);
   };
 
-  const onDelete = (toDeleteContact) => {
-    toDelete(toDeleteContact);
+  const handleDeleteClick = (city) => {
+    onDelete(city.user_id);
   };
 
   return (
     <Card>
       <Card.Body>
         <Card.Title style={{ marginBottom: "15px" }}>
-          {contact.firstname} {contact.lastname}
+          {city.username}
         </Card.Title>
-        <Card.Text>Phone Number: {contact.phone}</Card.Text>
-        <Card.Text>Email: {contact.email}</Card.Text>
-        <Card.Text>Notes: {contact.notes}</Card.Text>
+        <Card.Text>{city.fav_city}</Card.Text>
+        <Card.Text>Email: {city.state_code}</Card.Text>
         <Button
           variant="outline-danger"
           onClick={() => {
-            onDelete(contact);
+            handleDeleteClick(city);
           }}
           style={{ padding: "0.6em", marginRight: "0.9em" }}
         >
@@ -34,7 +32,7 @@ const Contact = ({ contact, toUpdate, toDelete }) => {
         <Button
           variant="outline-info"
           onClick={() => {
-            onUpdate(contact);
+            handleEditClick(city);
           }}
           style={{ padding: "0.6em" }}
         >
@@ -46,4 +44,4 @@ const Contact = ({ contact, toUpdate, toDelete }) => {
   );
 };
 
-export default Contact;
+export default City;

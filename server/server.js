@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // get all the favorite cities that are saved for a user
-app.get("/api/users", async (req, res) => {
+app.get("/api/cities", async (req, res) => {
   try {
     const { rows: users } = await db.query("SELECT * FROM users");
     res.json(users);
@@ -78,7 +78,7 @@ app.delete("/api/user/:userId", async (req, res) => {
 });
 
 //A put request - Update a user fav city
-app.put("/api/contact/:userId", async (req, res) => {
+app.put("/api/user/:userId", async (req, res) => {
   console.log(req.body);
   const userId = req.params.userId;
   const { username, fav_city, state_code } = req.body;
